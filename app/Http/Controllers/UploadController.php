@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Upload;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Sabre\Xml\Service;
-use Exception;
 
 class UploadController extends Controller
 {
@@ -57,7 +57,7 @@ class UploadController extends Controller
                     $writer->startElement('record');
                     foreach ($item as $key => $value) {
                         $tag = preg_replace('/[^A-Za-z0-9_]/', '_', trim($key));
-                        $writer->writeElement($tag, trim((string) $value));
+                        $writer->writeElement($tag, trim((string)$value));
                     }
                     $writer->endElement();
                 }
@@ -72,12 +72,10 @@ class UploadController extends Controller
                 'xml_filepath' => $xmlPath,
             ]);
 
-            return response()->json([
-                'message' => 'XML faylı yaradıldı.',
-                'xml_download_url' => Storage::url($xmlPath),
-                'upload' => $upload,
-            ], 200);
-
+            return $this->apiResponse(['xml_download_url' => Storage::url($xmlPath), 'upload' => $upload],
+                'success',
+                'XML file was created',
+                '200');
 
         } catch (Exception $e) {
             Log::error('Upload Error: ' . $e->getMessage());
@@ -87,10 +85,7 @@ class UploadController extends Controller
                 'error_message' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'message' => 'Fayl emal edilərkən xəta baş verdi.',
-                'error' => $e->getMessage(),
-            ], 500);
+            return $this->apiResponse('', 'Error', 'There was an error uploading the file.', '500');
         }
     }
 }
