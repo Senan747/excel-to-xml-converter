@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- Type Definition -->
+
+  <xs:simpleType name="all_allow_str50">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="50" />
+      <xs:minLength value="1" />
+      <!-- removing whitespaces and allowing only numbers and letters -->
+      <xs:whiteSpace value="collapse"/>
+      <xs:pattern value="[\p{L}0-9\-\\/]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="str50_firstlastname">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="50" />
+      <!--<xs:pattern value="[\p{L}\p{Zs}0-9\\&#45;]+"/>-->
+      <!--&#45; = allows hyphen (-)-->
+      <xs:pattern value="[\p{L}\p{Zs}0-9\\'\\&#45;]+"/>
+      <!-- allows ' -->
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="str50_firstname">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="50" />
+      <xs:pattern value="[\p{L}\p{Zs}0-9\\'\\&#45;]+|\[NA\]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="allowing_str50">
+    <xs:restriction base="xs:token">
+      <xs:maxLength value="50" />
+      <!--<xs:pattern value="[\p{L}\p{Zs}0-9\\x38\\.\\'\\&amp;\\/\\&#45;]+"/>-->
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!-- End Type definition -->
+
+  <xs:element name="IPD-UPLOAD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="HEADER" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="USER-NAME" minOccurs="1" maxOccurs="1">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="50"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="PASSWD" minOccurs="0" maxOccurs="1">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="50"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="UPLOADING-SOCIETY" minOccurs="1" maxOccurs="1">
+                <xs:simpleType>
+                  <!-- Adding two new societies @2013-10-01  -->
+                  <!-- Adding two new societies @2014-05-08  -->
+                  <!-- Changing: ZAVOD-IPD to IPF @2014-09-15  -->
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="30"/>
+                    <!--<xs:pattern value="AARC|ABRAMUS|ACTRA|ADAMI|AFM SAG-AFTRA|AGATA|AIE|AIPA|AIS|AISGE|AMANAT|APOLLON|ARTISTI|ARTISTI7607|BECS|CHILE ACTORES|CPRA|CREDIDAM|EEL|EJI|ERATO|FILMEX|FKMP|GCA|GDA|GRAMEX DK|GRAMEX FIN|GRAMO|GVL|HUZIP|INTERGRAM|IPF|ISRA|ITSRIGHT|LAIPA|LSG|MROC|NORMA|NUOVO IMAIE|OZIS|PI|PLAYRIGHT|PPL|PROPHON|RAAP|SAI|SAMI|SAMPRA|SAWP|SCAPR|SENA|SFH|SLOVGRAM|SOCINPRO|SOUNDEXCHANGE|SPEDIDAM|STOART|SWISSPERFORM|UBC|ULCRR|UNKNOWN|VDFS|VOIS"/>-->
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="FILE-ID" minOccurs="0" maxOccurs="1">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:minLength value="0"/>
+                    <xs:maxLength value="50"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ISO-CHAR-SET" minOccurs="1" maxOccurs="1">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <!--<xs:minLength value="9"/>
+                    <xs:maxLength value="9"/>-->
+                    <xs:pattern value="ISO8859-1|ISO8859-2"/>
+                    <!--<xs:pattern value="UTF-8"/>-->
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="RIGHTHOLDERS">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="RIGHTHOLDER" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="ACTION">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="INSERT" />
+                          <xs:enumeration value="UPDATE" />
+                          <xs:enumeration value="DELETE" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="IPN" minOccurs="0" maxOccurs="1">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:pattern value="([1,9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])*" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="RIGHTHOLDER-LOCAL-ID" type="all_allow_str50" ></xs:element>
+                    <xs:element name="RIGHTHOLDER-FIRST-NAME" type="str50_firstname" />
+                    <xs:element name="RIGHTHOLDER-LAST-NAME" type="str50_firstlastname" />
+                    <xs:element name="SEX">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:enumeration value="M" />
+                          <xs:enumeration value="F" />
+                          <xs:enumeration value="C" />
+                          <xs:enumeration value="X" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="DATE-OF-BIRTH">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <!--<xs:pattern value="([1-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9])" />-->
+                          <xs:pattern value="([1-2][0,8,9][0-9][0-9]-[0-1][0-9]-[0-3][0-9])" />
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="COUNTRY-OF-BIRTH" minOccurs="0">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:pattern value="\d{0}|[A-Z]{3}"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="COUNTRY-OF-RESIDENCE" minOccurs="1">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:minLength value="3"/>
+                          <xs:maxLength value="3"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+                    <xs:element name="IDENTIFYING-ROLES">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="IDENTIFYING-ROLE-CODE" minOccurs="1" maxOccurs="15">
+                            <xs:simpleType>
+                              <xs:restriction base="xs:string">
+                                <xs:enumeration value="SI" />
+                                <xs:enumeration value="MU" />
+                                <xs:enumeration value="CO" />
+                                <xs:enumeration value="AC" />
+                                <xs:enumeration value="DA" />
+                                <xs:enumeration value="SM" />
+                                <xs:enumeration value="CS" />
+                                <xs:enumeration value="BP" />
+                                <xs:enumeration value="SO" />
+                                <xs:enumeration value="CM" />
+                                <xs:enumeration value="VA" />
+                                <xs:enumeration value="SA" />
+                                <xs:enumeration value="CA" />
+                                <xs:enumeration value="PU" />
+                                <xs:enumeration value="TD" />
+                              </xs:restriction>
+                            </xs:simpleType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="INSTRUMENTS" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="INSTRUMENT" maxOccurs="unbounded" minOccurs="0">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="INSTRUMENT-TYPE" maxOccurs="1">
+                                  <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                      <xs:enumeration value="KEYBOARDS" />
+                                      <xs:enumeration value="MECHANICAL" />
+                                      <xs:enumeration value="PERCUSSION" />
+                                      <xs:enumeration value="STRINGS" />
+                                      <xs:enumeration value="TUNED PERC" />
+                                      <xs:enumeration value="VOCAL" />
+                                      <xs:enumeration value="WIND" />
+                                      <xs:enumeration value="NUM-OF-PERFORMERS" />
+                                    </xs:restriction>
+                                  </xs:simpleType>
+                                </xs:element>
+                                <xs:element name="INSTRUMENT-INFO" type="xs:string" />
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="MAIN-ARTISTS" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="MAIN-ARTIST" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="MAIN-ARTIST-NAME" type="allowing_str50" />
+                                <xs:element name="IMAN">
+                                  <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                      <xs:pattern value="([0-9]{10})*" />
+                                    </xs:restriction>
+                                  </xs:simpleType>
+                                </xs:element>
+                                <xs:element name="MAIN-ARTIST-JOIN-DATE">
+                                  <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                      <xs:pattern value="([0-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9])*" />
+                                    </xs:restriction>
+                                  </xs:simpleType>
+                                </xs:element>
+                                <xs:element name="MAIN-ARTIST-LEAVE-DATE">
+                                  <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                      <xs:pattern value="([0-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9])*" />
+                                    </xs:restriction>
+                                  </xs:simpleType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="PSEUDONAMES" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="PSEUDONAME" type="str50_firstlastname" maxOccurs="unbounded" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+
+                    <xs:element name="MANDATE-INFOS" minOccurs="1" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <!--More than one MANDATE-INFO block allowed-->
+                          <xs:element name="MANDATE-INFO" minOccurs="1" maxOccurs="unbounded">
+                            <!--One MANDATE-INFO block allowed-->
+                            <!--<xs:element name="MANDATE-INFO" minOccurs="1" maxOccurs="1">-->
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="MANDATE-TYPE" minOccurs="1" maxOccurs="1">
+                                  <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                      <xs:enumeration value="WW" />
+                                      <xs:enumeration value="R" />
+                                      <xs:enumeration value="WW-" />
+                                      <xs:enumeration value="R+" />
+                                    </xs:restriction>
+                                  </xs:simpleType>
+                                </xs:element>
+                                <xs:element name="MANDATED-SOCIETY-CODE" minOccurs="1" maxOccurs="1">
+                                  <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                      <xs:pattern value="\d{1}|[0-9]{0,100}"/>
+                                    </xs:restriction>
+                                  </xs:simpleType>
+                                </xs:element>
+                                <xs:element name="MANDATED-SOCIETY-NAME" minOccurs="1" maxOccurs="1">
+                                  <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                      <xs:minLength value="1"/>
+                                      <xs:maxLength value="30"/>
+                                      <!--<xs:pattern value="AARC|ABRAMUS|ACTRA|ADAMI|AFM SAG-AFTRA|AGATA|AIE|AIPA|AIS|AISGE|AMANAT|APOLLON|ARTISTI|ARTISTI7607|BECS|CHILE ACTORES|CPRA|CREDIDAM|EEL|EJI|ERATO|FILMEX|FKMP|GCA|GDA|GRAMEX DK|GRAMEX FIN|GRAMO|GVL|HUZIP|INTERGRAM|IPF|ISRA|ITSRIGHT|LAIPA|LSG|MROC|NORMA|NUOVO IMAIE|OZIS|PI|PLAYRIGHT|PPL|PROPHON|RAAP|SAI|SAMI|SAMPRA|SAWP|SCAPR|SENA|SFH|SLOVGRAM|SOCINPRO|SOUNDEXCHANGE|SPEDIDAM|STOART|SWISSPERFORM|UBC|ULCRR|UNKNOWN|VDFS|VOIS"/>-->
+                                    </xs:restriction>
+                                  </xs:simpleType>
+                                </xs:element>
+                                <xs:element name="MANDATE-PARAMETERS" minOccurs="1" maxOccurs="1">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="MANDATE-PARAMETER" maxOccurs="unbounded">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="TERRITORY-COUNTRY" minOccurs="0" maxOccurs="1">
+                                              <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                  <xs:pattern value="\d{0}|[A-Z]{3}"/>
+                                                </xs:restriction>
+                                              </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="MANDATE-START-DATE" minOccurs="1" maxOccurs="1">
+                                              <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                  <!--<xs:pattern value="([1-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9])" />-->
+                                                  <xs:pattern value="([1-2][0,8,9][0-9][0-9]-[0-1][0-9]-[0-3][0-9])" />
+                                                </xs:restriction>
+                                              </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="MANDATE-END-DATE" minOccurs="0" maxOccurs="1">
+                                              <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                  <!--<xs:pattern value="\d{0}|([1-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9])"/>-->
+                                                  <xs:pattern value="\d{0}|([1-2][0,8,9][0-9][0-9]-[0-1][0-9]-[0-3][0-9])" />
+                                                </xs:restriction>
+                                              </xs:simpleType>
+                                            </xs:element>
+                                            <xs:element name="PERFORMANCE-TYPES" minOccurs="0" maxOccurs="1">
+                                              <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element name="PERFORMANCE-TYPE-CODE" minOccurs="0" maxOccurs="2">
+                                                    <xs:simpleType>
+                                                      <xs:restriction base="xs:string">
+                                                        <xs:enumeration value="" />
+                                                        <xs:enumeration value="AU" />
+                                                        <xs:enumeration value="AV" />
+                                                      </xs:restriction>
+                                                    </xs:simpleType>
+                                                  </xs:element>
+                                                </xs:sequence>
+                                              </xs:complexType>
+                                            </xs:element>
+                                            <xs:element name="PERFORMER-ACTIVITIES" minOccurs="0" maxOccurs="1">
+                                              <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element name="PERFORMER-ACTIVITY-CODE" minOccurs="0" maxOccurs="3">
+                                                    <xs:simpleType>
+                                                      <xs:restriction base="xs:string">
+                                                        <xs:enumeration value="" />
+                                                        <xs:enumeration value="SI" />
+                                                        <xs:enumeration value="AC" />
+                                                        <xs:enumeration value="MU" />
+                                                      </xs:restriction>
+                                                    </xs:simpleType>
+                                                  </xs:element>
+                                                </xs:sequence>
+                                              </xs:complexType>
+                                            </xs:element>
+                                            <xs:element name="RIGHTS" minOccurs="0" maxOccurs="1">
+                                              <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element name="RIGHT-CODE" minOccurs="0" maxOccurs="9">
+                                                    <xs:simpleType>
+                                                      <xs:restriction base="xs:string">
+                                                        <xs:enumeration value="" />
+                                                        <xs:enumeration value="PP" />
+                                                        <xs:enumeration value="RR" />
+                                                        <xs:enumeration value="PC" />
+                                                        <xs:enumeration value="RE" />
+                                                        <xs:enumeration value="LE" />
+                                                        <xs:enumeration value="RP" />
+                                                        <xs:enumeration value="BR" />
+                                                        <xs:enumeration value="CP" />
+                                                        <xs:enumeration value="MA" />
+                                                      </xs:restriction>
+                                                    </xs:simpleType>
+                                                  </xs:element>
+                                                </xs:sequence>
+                                              </xs:complexType>
+                                            </xs:element>
+                                            <xs:element name="CONDITIONAL-ASPECTS" minOccurs="0" maxOccurs="1">
+                                              <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element name="CONDITIONAL-ASPECT-CODE" minOccurs="0" maxOccurs="2">
+                                                    <xs:simpleType>
+                                                      <xs:restriction base="xs:string">
+                                                        <xs:enumeration value="" />
+                                                        <xs:enumeration value="FA" />
+                                                        <xs:enumeration value="NF" />
+                                                      </xs:restriction>
+                                                    </xs:simpleType>
+                                                  </xs:element>
+                                                </xs:sequence>
+                                              </xs:complexType>
+                                            </xs:element>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                              <!--MANDATE-INFO-->
+                            </xs:complexType>
+                            <!--MANDATE-INFO-->
+                          </xs:element>
+                          <!--MANDATE-INFOS-->
+                        </xs:sequence>
+                        <!--MANDATE-INFO-->
+                      </xs:complexType>
+                      <!--MANDATE-INFOS-->
+                    </xs:element>
+                    <!--MANDATE-INFOS-->
+
+                    <xs:element name="ADDITIONAL-INFO" minOccurs="0" maxOccurs="1">
+                      <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                          <xs:minLength value="0"/>
+                          <xs:maxLength value="150"/>
+                        </xs:restriction>
+                      </xs:simpleType>
+                    </xs:element>
+
+                  </xs:sequence>
+                  <!--RIGHTHOLDER-->
+                </xs:complexType>
+                <!--RIGHTHOLDER-->
+              </xs:element>
+              <!--RIGHTHOLDER-->
+
+            </xs:sequence>
+            <!--RIGHTHOLDERS-->
+          </xs:complexType>
+          <!--RIGHTHOLDERS-->
+        </xs:element>
+        <!--RIGHTHOLDERS-->
+
+      </xs:sequence>
+      <!--IPD-UPLOAD-->
+    </xs:complexType>
+    <!--IPD-UPLOAD-->
+  </xs:element>
+  <!--IPD-UPLOAD-->
+</xs:schema>
