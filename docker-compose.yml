@@ -17,6 +17,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - PHP_MEMORY_LIMIT=512M
       - DB_HOST=db
       - DB_DATABASE=laravel
       - DB_USERNAME=laravel

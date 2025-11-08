@@ -2,20 +2,22 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
-use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
-use Carbon\Carbon;
+use XMLWriter;
 
 class UploadService
 {
-    public function processUpload($file)
+    public function processUpload(string $filePath)
     {
-        $array = Excel::toArray([], $file);
+        $absolutePath = storage_path('app/public/' . $filePath);
+
+        $array = Excel::toArray([], $absolutePath);
         $rows = $array[0] ?? [];
 
         if (count($rows) < 2) {
-            throw new \Exception('Faylda başlıq və ya məlumat tapılmadı.');
+            throw new Exception('Faylda başlıq və ya məlumat tapılmadı.');
         }
 
         $headers = $rows[0];
@@ -28,7 +30,6 @@ class UploadService
             foreach ($headers as $key => $header) {
                 $cleanHeader = str_replace(' ', '_', trim($header));
                 $value = $row[$key] ?? '';
-
                 $item[$cleanHeader] = $value;
             }
             $xmlData[] = $item;
@@ -49,7 +50,7 @@ class UploadService
 
     private function generateXml(array $data)
     {
-        $xml = new \XMLWriter();
+        $xml = new XMLWriter();
         $xml->openMemory();
         $xml->startDocument('1.0', 'UTF-8');
         $xml->setIndent(true);
@@ -71,15 +72,21 @@ class UploadService
             $xml->writeElement('IDENTIFYING-ROLE-CODE', $roleCode);
 
             foreach ($item as $key => $value) {
-                if (!in_array($key, ['FULL_NAME', 'DATE_OF_BIRTH', 'MANDATE_START_DATE', 'MANDATE_END_DATE', 'IDENTIFYING_ROLE_CODE'])) {
+                if (!in_array($key, [
+                    'FULL_NAME',
+                    'DATE_OF_BIRTH',
+                    'MANDATE_START_DATE',
+                    'MANDATE_END_DATE',
+                    'IDENTIFYING_ROLE_CODE'
+                ])) {
                     $xml->writeElement(strtoupper($key), $value);
                 }
             }
 
-            $xml->endElement(); // </IPN>
+            $xml->endElement();
         }
 
-        $xml->endElement(); // </IPN-LIST>
+        $xml->endElement();
         $xml->endDocument();
 
         return $xml->outputMemory();
