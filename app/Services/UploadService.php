@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
-use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
-use Carbon\Carbon;
+use XMLWriter;
 
 class UploadService
 {
@@ -15,7 +15,7 @@ class UploadService
         $rows = $array[0] ?? [];
 
         if (count($rows) < 2) {
-            throw new \Exception('Faylda başlıq və ya məlumat tapılmadı.');
+            throw new Exception('There is no information');
         }
 
         $headers = $rows[0];
@@ -49,7 +49,7 @@ class UploadService
 
     private function generateXml(array $data)
     {
-        $xml = new \XMLWriter();
+        $xml = new XMLWriter();
         $xml->openMemory();
         $xml->startDocument('1.0', 'UTF-8');
         $xml->setIndent(true);
@@ -71,17 +71,30 @@ class UploadService
             $xml->writeElement('IDENTIFYING-ROLE-CODE', $roleCode);
 
             foreach ($item as $key => $value) {
-                if (!in_array($key, ['FULL_NAME', 'DATE_OF_BIRTH', 'MANDATE_START_DATE', 'MANDATE_END_DATE', 'IDENTIFYING_ROLE_CODE'])) {
-                    $xml->writeElement(strtoupper($key), $value);
+                if (!in_array(
+                    $key,
+                    ['FULL_NAME', 'DATE_OF_BIRTH', 'MANDATE_START_DATE', 'MANDATE_END_DATE', 'IDENTIFYING_ROLE_CODE']
+                )) {
+                    $xml->writeElement($this->sanitizeXmlElementName($key), $value);
                 }
             }
 
-            $xml->endElement(); // </IPN>
+
+            $xml->endElement();
         }
 
-        $xml->endElement(); // </IPN-LIST>
+        $xml->endElement();
         $xml->endDocument();
 
         return $xml->outputMemory();
+    }
+
+    private function sanitizeXmlElementName($name)
+    {
+        $name = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $name);
+        if (preg_match('/^\d/', $name)) {
+            $name = '_' . $name;
+        }
+        return strtoupper($name);
     }
 }

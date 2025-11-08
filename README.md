@@ -1,59 +1,169 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Excel to XML Upload Service
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This Laravel project provides an API to upload Excel files (`.xlsx` or `.xls`) and convert them into XML format. The generated XML files are stored in the `public` storage disk, and a download URL is returned in the API response.
 
-## About Laravel
+The project uses Docker for containerization, making setup and deployment easier and consistent across environments.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* Upload Excel files via API
+* Validate Excel file type and size
+* Convert Excel data to XML
+* Store XML files in public storage
+* Return download URL for the XML file
+* Dockerized for easy development and deployment
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Requirements
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+* Docker & Docker Compose installed
+* PHP 8.1+ (handled by Docker)
+* Composer (handled by Docker)
+* Laravel 10+
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Getting Started
 
-### Premium Partners
+### 1. Clone the repository
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+git clone https://github.com/Senan747/excel-to-xml-converter.git
+cd excel-to-xml-converter
+```
 
-## Contributing
+### 2. Copy the environment file
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+cp .env.example .env
+```
 
-## Code of Conduct
+Update `.env` if needed (e.g., database configuration, storage settings).
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 3. Build and run Docker containers
 
-## Security Vulnerabilities
+```bash
+docker-compose up -d --build
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+This will start the following services:
 
-## License
+* **app**: Laravel PHP container
+* **db**: MySQL database container
+* **phpmyadmin** (optional): MySQL admin interface
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 4. Install dependencies inside the container
+
+```bash
+docker exec -it app bash
+composer install
+php artisan key:generate
+```
+
+### 5. Set up storage link
+
+```bash
+php artisan storage:link
+```
+
+This ensures uploaded files are accessible via the public URL.
+
+---
+
+## API Usage
+
+### Endpoint
+
+```
+POST /api/upload
+```
+
+### Request Parameters
+
+| Parameter | Type | Description                    |
+| --------- | ---- | ------------------------------ |
+| file      | file | Excel file (`.xlsx` or `.xls`) |
+
+### Response
+
+**Success (200):**
+
+```json
+{
+  "status": "success",
+  "message": "XML successfully uploaded.",
+  "data": {
+    "file_name": "ipn_2025_11_08_120000.xml",
+    "download_url": "http://localhost/storage/ipn_2025_11_08_120000.xml"
+  }
+}
+```
+
+**Validation Error (422):**
+
+```json
+{
+  "status": "error",
+  "message": "Validation failed",
+  "errors": {
+    "file": ["The file must be an Excel file."]
+  }
+}
+```
+
+**Server Error (500):**
+
+```json
+{
+  "status": "error",
+  "message": "There is an error while creating xml: ..."
+}
+```
+
+---
+
+## File Storage
+
+Uploaded XML files are stored in:
+
+```
+storage/app/public/
+```
+
+They can be accessed via:
+
+```
+http://<your-domain>/storage/<file_name>.xml
+```
+
+---
+
+## Docker Commands
+
+* **Start containers**:
+
+```bash
+docker-compose up -d
+```
+
+* **Stop containers**:
+
+```bash
+docker-compose down
+```
+
+* **Access app container**:
+
+```bash
+docker exec -it <app_container_name> bash
+```
+
+* **Run artisan commands** inside container:
+
+```bash
+php artisan migrate
+php artisan storage:link
+```
