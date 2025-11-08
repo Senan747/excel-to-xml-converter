@@ -158,7 +158,7 @@ docker-compose down
 * **Access app container**:
 
 ```bash
-docker exec -it <app_container_name> bash
+docker exec -it app bash
 ```
 
 * **Run artisan commands** inside container:
